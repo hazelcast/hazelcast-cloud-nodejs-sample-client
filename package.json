@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "client": "npm install && node client.js",
-    "client_with_ssl": "npm install && client_with_ssl.js"
+    "client_with_ssl": "npm install && node client_with_ssl.js"
   },
   "author": "",
   "dependencies": {
