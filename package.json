@@ -1,10 +1,11 @@
 {
-  "name": "sample",
+  "name": "hazelcast-cloud-nodejs-sample-client",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "client": "npm install && node client.js",
+    "client_with_ssl": "npm install && client_with_ssl.js"
   },
   "author": "",
   "dependencies": {
