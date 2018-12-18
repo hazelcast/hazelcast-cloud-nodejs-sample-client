@@ -1,15 +1,18 @@
 var Client = require('hazelcast-client').Client;
 var ClientConfig = require('hazelcast-client').Config.ClientConfig;
+var path = require('path')
 
 function createClientConfig() {
     var fs = require('fs');
     var cfg = new ClientConfig();
-    var currentDir = process.pwd();
+    var caFile = path.resolve(path.join(__dirname, 'ca.pem'));
+    var certFile = path.resolve(path.join(__dirname, 'cert.pem'));
+    var keyFile = path.resolve(path.join(__dirname, 'key.pem'));
     cfg.networkConfig.sslOptions = {
         rejectUnauthorized: false,
-        ca: [fs.readFileSync(`${currentDir}/ca.pem`)],
-        cert: [fs.readFileSync(`${currentDir}/cert.pem`)],
-        key: [fs.readFileSync(`${currentDir}/key.pem`)],
+        ca: [fs.readFileSync(caFile)],
+        cert: [fs.readFileSync(certFile)],
+        key: [fs.readFileSync(keyFile)],
         passphrase: 'YOUR_SSL_PASSWORD'
     };
     cfg.networkConfig.cloudConfig.enabled = true;
