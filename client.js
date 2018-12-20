@@ -17,12 +17,18 @@ function createClientConfig() {
 var cfg = createClientConfig();
 
 Client.newHazelcastClient(cfg).then(function (client) {
-    var map = client.getMap("testMap")
+    var map = client.getMap("map")
 
     map.put('key', 'value').then(function () {
         return map.get('key');
     }).then((res) => {
-        console.log(res);
-        client.shutdown();
-    });
+        if(res === 'value')
+    {
+        console.log("Connection Successful!");
+    }
+    else {
+        throw new Error("Connection failed, check your configuration.");
+    }
+    client.shutdown();
+});
 });
