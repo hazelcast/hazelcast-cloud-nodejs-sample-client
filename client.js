@@ -11,6 +11,8 @@ function createClientConfig() {
     cfg.groupConfig.name = 'YOUR_CLUSTER_NAME';
     cfg.groupConfig.password = 'YOUR_CLUSTER_PASSWORD';
     cfg.properties['hazelcast.client.cloud.url'] = 'YOUR_DISCOVERY_URL';
+    cfg.properties['hazelcast.client.statistics.enabled'] = true;
+    cfg.properties['hazelcast.client.statistics.period.seconds'] = 1;
     return cfg;
 }
 
