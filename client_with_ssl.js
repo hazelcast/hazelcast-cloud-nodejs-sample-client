@@ -1,3 +1,4 @@
+var async = require('async');
 var Client = require('hazelcast-client').Client;
 var ClientConfig = require('hazelcast-client').Config.ClientConfig;
 var path = require('path')
