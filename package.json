@@ -9,6 +9,6 @@
   },
   "author": "",
   "dependencies": {
-    "hazelcast-client": "^4.0.0"
+    "hazelcast-client": "^4.0.1"
   }
 }
