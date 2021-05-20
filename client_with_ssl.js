@@ -41,11 +41,14 @@ function createClientConfig() {
         }
         console.log("Connection Successful!");
         console.log("Now, `map` will be filled with random entries.");
+
+        var iterationCounter = 0;
         while (true) {
             const randomKey = Math.floor(Math.random() * 100000);
             await map.put('key' + randomKey, 'value' + randomKey)
             await map.get('key' + randomKey);
-            if (randomKey % 10 === 0) {
+            if (++iterationCounter === 10) {
+                iterationCounter = 0;
                 map.size().then((size) => console.log(`map size: ${size}`));
             }
         }
