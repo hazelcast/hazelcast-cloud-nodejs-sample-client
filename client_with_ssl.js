@@ -51,13 +51,15 @@ Client.newHazelcastClient(cfg).then(function (hazelcastClient) {
               console.log("Connection Successful!");
               console.log("Now, `map` will be filled with random entries.");
 
+              var iterationCounter = 0;
               async.whilst(() => {
                 return true;
               },(next) => {
                 var randomKey = Math.floor(Math.random() * 100000);
                 map.put('key' + randomKey, 'value' + randomKey).then(function () {
                     map.get('key' + randomKey);
-                    if (randomKey % 10 == 0) {
+                    if (++iterationCounter === 10) {
+                        iterationCounter = 0;
                         map.size().then((size) => console.log(`map size: ${size}`));
                     }
                     next();
