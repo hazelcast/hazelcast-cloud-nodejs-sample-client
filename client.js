@@ -39,8 +39,7 @@ function sqlExample(hzClient) {
     (async () => {
         console.log("Creating a mapping...");
         // See: https://docs.hazelcast.com/hazelcast/5.0/sql/mapping-to-maps
-        await hzClient.getSql().execute("DROP MAPPING cities");
-        const mappingQuery = "CREATE MAPPING cities TYPE IMap OPTIONS " +
+        const mappingQuery = "CREATE OR REPLACE MAPPING cities TYPE IMap OPTIONS " +
             "('keyFormat'='varchar','valueFormat'='varchar')";
         await hzClient.getSql().execute(mappingQuery);
         console.log("The mapping has been created successfully.");
