@@ -28,7 +28,8 @@ async function mapExample(map) {
         await map.get('key' + randomKey);
         if (++iterationCounter === 10) {
             iterationCounter = 0;
-            map.size().then((size) => console.log(`map size: ${size}`));
+            const size = await map.size();
+            console.log(`map size: ${size}`);
         }
     }
 }
@@ -64,8 +65,8 @@ async function sqlExample(hzClient) {
     const sqlResultAll = await hzClient.getSql()
         .execute("SELECT * FROM cities", [], {returnRawResult: true});
     for await (const row of sqlResultAll) {
-        let country = row.getObject(0);
-        let city = row.getObject(1);
+        const country = row.getObject(0);
+        const city = row.getObject(1);
         console.log("%s - %s", country, city);
     }
     console.log("--------------------");
@@ -74,8 +75,8 @@ async function sqlExample(hzClient) {
     const sqlResultRecord = await hzClient.getSql()
         .execute("SELECT __key AS country, this AS city FROM cities WHERE __key = ?", ["United States"]);
     for await (const row of sqlResultRecord) {
-        let country = row.country;
-        let city = row.city;
+        const country = row.country;
+        const city = row.city;
         console.log("Country name: %s; City name: %s", country, city);
     }
     console.log("--------------------");
