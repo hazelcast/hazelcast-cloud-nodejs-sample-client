@@ -129,7 +129,7 @@ async function populateCountriesMap(hzClient) {
     await countries.set("AU", {"isoCode":"AU", "country":"Australia"});
     await countries.set("EN", {"isoCode":"EN", "country":"England"});
     await countries.set("US", {"isoCode":"US", "country":"United States"});
-    await countries.set("CZ", {"isoCode":"US", "country":"Czech Republic"});
+    await countries.set("CZ", {"isoCode":"CZ", "country":"Czech Republic"});
     console.log("The 'countries' map has been populated.");
     console.log("--------------------");
 }
