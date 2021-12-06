@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": ">=10.4.0"
+  },
   "scripts": {
     "client": "npm install && node client.js",
     "client_with_ssl": "npm install && node client_with_ssl.js"
