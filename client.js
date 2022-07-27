@@ -2,28 +2,38 @@
 
 const {Client, HazelcastJsonValue} = require('hazelcast-client');
 
-async function mapExample(map){
-    console.log("Now the 'map' will be filled with city entries.");
-    const citiesData = [
-        { country: 'United Kingdom', name: 'London', population: 9_540_576 },
-        { country: 'United Kingdom', name: 'Manchester', population: 1_890_976 },
-        { country: 'United States', name: 'New York', population: 8_890_976 },
-        { country: 'United States', name: 'Los Angeles', population: 3_840_376 },
-        { country: 'Turkey', name: 'Istanbul', population: 1_890_912 },
-        { country: 'Turkey', name: 'Ankara', population: 1_890_112 },
-        { country: 'Brazil', name: 'Sao Paulo', population: 3_235_376 },
-        { country: 'Brazil', name: 'Rio de Janeiro', population: 2_890_976 }
-    ];
-    await map.putAll(citiesData.map((map, index) => {
-        return [index, new HazelcastJsonValue(JSON.stringify(map))];
-    }));
+async function mapExample(client){
+    const cities = await client.getMap('cities');
+    await cities.put(1, new HazelcastJsonValue(JSON.stringify({ country: "United Kingdom", city: "London", population: 9_540_576})));
+    await cities.put(2, new HazelcastJsonValue(JSON.stringify({ country: "United Kingdom", city: "Manchester", population: 2_770_434})));
+    await cities.put(3, new HazelcastJsonValue(JSON.stringify({ country: "United States", city: "New York", population: 19_223_191})));
+    await cities.put(4, new HazelcastJsonValue(JSON.stringify({ country: "United States", city: "Los Angeles", population: 3_985_520})));
+    await cities.put(5, new HazelcastJsonValue(JSON.stringify({ country: "Turkey", city: "Ankara", population: 5_309_690})));
+    await cities.put(6, new HazelcastJsonValue(JSON.stringify({ country: "Turkey", city: "Istanbul", population: 15_636_243})));
+    await cities.put(7, new HazelcastJsonValue(JSON.stringify({ country: "Brazil", city: "Sao Paulo", population: 22_429_800})));
+    await cities.put(8, new HazelcastJsonValue(JSON.stringify({ country: "Brazil", city: "Rio de Janeiro", population: 13_635_274})));
 
-    var mapSize = await map.size();
-    console.log(`'Map' now contains ${mapSize} entries.`);
-    console.log("--------------------");   
+    const mapSize = await cities.size();
+    console.log(`'cities' map now contains ${mapSize} entries.`);
+
+    console.log("--------------------");
 }
 
 async function sqlExample(hzClient) {
+    await createMappingForCapitals(hzClient);
+
+    await clearCapitals(hzClient);
+
+    await populateCapitals(hzClient);
+
+    await selectAllCapitals(hzClient);
+
+    await selectCapitalNames(hzClient);
+
+    process.exit(0);
+}
+
+async function createMappingForCapitals(client){
     console.log("Creating a mapping...");
     // See: https://docs.hazelcast.com/hazelcast/5.0/sql/mapping-to-maps
     const mappingQuery = `
@@ -32,16 +42,20 @@ async function sqlExample(hzClient) {
             'keyFormat'='varchar',
             'valueFormat'='varchar'
         );`;
-    await hzClient.getSql().execute(mappingQuery);
+    await client.getSql().execute(mappingQuery);
     console.log("The mapping has been created successfully.");
     console.log("--------------------");
+}
 
+async function clearCapitals(client){
     console.log("Deleting data via SQL...");
     const deleteQuery = "DELETE FROM cities";
-    await hzClient.getSql().execute(deleteQuery);
+    await client.getSql().execute(deleteQuery);
     console.log("The data has been deleted successfully.");
     console.log("--------------------");
+}
 
+async function populateCapitals(client){
     console.log("Inserting data via SQL...");
     const insertQuery = `
         INSERT INTO cities
@@ -51,12 +65,14 @@ async function sqlExample(hzClient) {
                ('England', 'London'),
                ('Turkey', 'Ankara'),
                ('United States', 'Washington, DC');`;
-    await hzClient.getSql().execute(insertQuery);
+    await client.getSql().execute(insertQuery);
     console.log("The data has been inserted successfully.");
     console.log("--------------------");
+}
 
+async function selectAllCapitals(client){
     console.log("Retrieving all the data via SQL...");
-    const sqlResultAll = await hzClient.getSql()
+    const sqlResultAll = await client.getSql()
         .execute("SELECT * FROM cities", [], {returnRawResult: true});
     for await (const row of sqlResultAll) {
         const country = row.getObject(0);
@@ -64,9 +80,11 @@ async function sqlExample(hzClient) {
         console.log(`${country} - ${city}`);
     }
     console.log("--------------------");
+}
 
+async function selectCapitalNames(client){
     console.log("Retrieving a city name via SQL...");
-    const sqlResultRecord = await hzClient.getSql()
+    const sqlResultRecord = await client.getSql()
         .execute("SELECT __key AS country, this AS city FROM cities WHERE __key = ?", ["United States"]);
     for await (const row of sqlResultRecord) {
         const country = row.country;
@@ -74,7 +92,6 @@ async function sqlExample(hzClient) {
         console.log(`Country name: ${country}; City name: ${city}`);
     }
     console.log("--------------------");
-    process.exit(0);
 }
 
 async function jsonSerializationExample(hzClient) {
@@ -206,14 +223,21 @@ async function selectCountriesAndCities(hzClient) {
     console.log("--------------------");
 }
 
-async function nonStopMapExample(map) {
+//
+//   This example shows how to work with Hazelcast maps, where the map is
+//   updated continuously.
+//
+//   @param client - a {@link HazelcastInstance} client.
+//
+async function nonStopMapExample(client) {
     console.log("Now, `map` will be filled with random entries.");
+    const map = await client.getMap('map');
 
     let iterationCounter = 0;
     while (true) {
         const randomKey = Math.floor(Math.random() * 100000);
         await map.put('key' + randomKey, 'value' + randomKey);
-        await map.get('key' + randomKey);
+        await map.get('key' + Math.floor(Math.random() * 100000))
         if (++iterationCounter === 10) {
             iterationCounter = 0;
             const size = await map.size();
@@ -231,24 +255,20 @@ async function nonStopMapExample(map) {
                         discoveryToken: 'YOUR_DISCOVERY_TOKEN'
                     }
                 },
-                clusterName: 'YOUR_CLUSTER_NAME',
-                properties: {
-                    'hazelcast.client.statistics.enabled': true,
-                    'hazelcast.client.statistics.period.seconds': 1,
-                }  
+                clusterName: 'YOUR_CLUSTER_NAME'
             }
         );
-        const map = await client.getMap('map');
         console.log("Connection Successful!");
-        
-        await mapExample(map);
 
-        // await sqlExample(client);
+        // await mapExample(client);
+
+        await sqlExample(client);
 
         // await jsonSerializationExample(client);
 
-        // await nonStopMapExample(map)
+        // await nonStopMapExample(client)
 
+        client.shutdown();
     } catch (err) {
         console.error('Error occurred:', err);
     }
