@@ -1,37 +1,26 @@
 'use strict';
 
-const {Client} = require('hazelcast-client');
+const {Client, HazelcastJsonValue} = require('hazelcast-client');
 
-function createClientConfig() {
-    return {
-        network: {
-            hazelcastCloud: {
-                discoveryToken: 'YOUR_CLUSTER_DISCOVERY_TOKEN'
-            }
-        },
-        clusterName: 'YOUR_CLUSTER_NAME',
-        properties: {
-            'hazelcast.client.cloud.url': 'YOUR_DISCOVERY_URL',
-            'hazelcast.client.statistics.enabled': true,
-            'hazelcast.client.statistics.period.seconds': 1,
-        }
-    }
-}
+async function mapExample(map){
+    console.log("Now the 'map' will be filled with city entries.");
+    const citiesData = [
+        { country: 'United Kingdom', name: 'London', population: 9_540_576 },
+        { country: 'United Kingdom', name: 'Manchester', population: 1_890_976 },
+        { country: 'United States', name: 'New York', population: 8_890_976 },
+        { country: 'United States', name: 'Los Angeles', population: 3_840_376 },
+        { country: 'Turkey', name: 'Istanbul', population: 1_890_912 },
+        { country: 'Turkey', name: 'Ankara', population: 1_890_112 },
+        { country: 'Brazil', name: 'Sao Paulo', population: 3_235_376 },
+        { country: 'Brazil', name: 'Rio de Janeiro', population: 2_890_976 }
+    ];
+    await map.putAll(citiesData.map((map, index) => {
+        return [index, new HazelcastJsonValue(JSON.stringify(map))];
+    }));
 
-async function mapExample(map) {
-    console.log("Now, `map` will be filled with random entries.");
-
-    let iterationCounter = 0;
-    while (true) {
-        const randomKey = Math.floor(Math.random() * 100000);
-        await map.put('key' + randomKey, 'value' + randomKey);
-        await map.get('key' + randomKey);
-        if (++iterationCounter === 10) {
-            iterationCounter = 0;
-            const size = await map.size();
-            console.log(`map size: ${size}`);
-        }
-    }
+    var mapSize = await map.size();
+    console.log(`'Map' now contains ${mapSize} entries.`);
+    console.log("--------------------");   
 }
 
 async function sqlExample(hzClient) {
@@ -217,19 +206,48 @@ async function selectCountriesAndCities(hzClient) {
     console.log("--------------------");
 }
 
+async function nonStopMapExample(map) {
+    console.log("Now, `map` will be filled with random entries.");
+
+    let iterationCounter = 0;
+    while (true) {
+        const randomKey = Math.floor(Math.random() * 100000);
+        await map.put('key' + randomKey, 'value' + randomKey);
+        await map.get('key' + randomKey);
+        if (++iterationCounter === 10) {
+            iterationCounter = 0;
+            const size = await map.size();
+            console.log(`Current map size: ${size}`);
+        }
+    }
+}
+
 (async () => {
     try {
-        const client = await Client.newHazelcastClient(createClientConfig());
+        const client = await Client.newHazelcastClient(
+            {
+                network: {
+                    hazelcastCloud: {
+                        discoveryToken: 'YOUR_DISCOVERY_TOKEN'
+                    }
+                },
+                clusterName: 'YOUR_CLUSTER_NAME',
+                properties: {
+                    'hazelcast.client.statistics.enabled': true,
+                    'hazelcast.client.statistics.period.seconds': 1,
+                }  
+            }
+        );
         const map = await client.getMap('map');
         console.log("Connection Successful!");
-
-        // the 'mapExample' is an example with an infinite loop inside, so if you'd like to try other examples,
-        // don't forget to comment out the following line
+        
         await mapExample(map);
 
         // await sqlExample(client);
 
         // await jsonSerializationExample(client);
+
+        // await nonStopMapExample(map)
 
     } catch (err) {
         console.error('Error occurred:', err);
