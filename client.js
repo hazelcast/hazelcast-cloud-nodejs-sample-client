@@ -24,7 +24,7 @@ async function mapExample(client){
 
 // This example shows how to work with Hazelcast SQL queries.
 //
-// @param client - a {@link HazelcastInstance} client.
+// @param client - a {@link HazelcastClient} client.
 //
 async function sqlExample(hzClient) {
 
