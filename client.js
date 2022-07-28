@@ -3,7 +3,7 @@
 const {Client, HazelcastJsonValue} = require('hazelcast-client');
 
 // This example shows how to work with Hazelcast maps.
-// @param client - a {@link HazelcastInstance} client.
+// @param client - a {@link HazelcastClient} client.
 //
 async function mapExample(client){
     const cities = await client.getMap('cities');
@@ -22,6 +22,10 @@ async function mapExample(client){
     console.log("--------------------");
 }
 
+// This example shows how to work with Hazelcast SQL queries.
+//
+// @param client - a {@link HazelcastInstance} client.
+//
 async function sqlExample(hzClient) {
 
     const sqlService = await hzClient.getSql();
