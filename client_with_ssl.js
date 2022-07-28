@@ -1,11 +1,13 @@
 'use strict';
 
 const {Client, HazelcastJsonValue} = require('hazelcast-client');
+const fs = require('fs');
+const path = require('path');
 
 
 // This example shows how to work with Hazelcast maps.
 // @param client - a {@link HazelcastClient} client.
-
+//
 async function mapExample(client){
     const cities = await client.getMap('cities');
     await cities.put(1, new HazelcastJsonValue(JSON.stringify({ country: "United Kingdom", city: "London", population: 9_540_576})));
@@ -81,7 +83,7 @@ async function populateCapitals(sqlService){
 async function selectAllCapitals(sqlService){
     console.log("Retrieving all the data via SQL...");
     const sqlResultAll = await sqlService
-        .execute("SELECT * FROM calpitals", [], {returnRawResult: true});
+        .execute("SELECT * FROM capitals", [], {returnRawResult: true});
     for await (const row of sqlResultAll) {
         const country = row.getObject(0);
         const city = row.getObject(1);
@@ -93,16 +95,18 @@ async function selectAllCapitals(sqlService){
 async function selectCapitalNames(sqlService){
     console.log("Retrieving a city name via SQL...");
     const sqlResultRecord = await sqlService
-        .execute( "SELECT __key, this FROM capitals WHERE __key = ?", "United States");
+        .execute( "SELECT __key, this FROM capitals WHERE __key = ?", ["United States"], {returnRawResult: true});
     for await (const row of sqlResultRecord) {
-        const country = row.country;
-        const city = row.city;
+        const country = row.getObject('__key');
+        const city = row.getObject('this');
         console.log(`Country name: ${country}; Capital name: ${city}`);
     }
     console.log("--------------------");
 }
 
 async function jsonSerializationExample(hzClient) {
+
+    const sqlService = hzClient.getSql();
 
     await createMappingForCountries(sqlService);
 
@@ -230,7 +234,6 @@ async function selectCountriesAndCities(sqlService) {
     console.log("--------------------");
 }
 
-//
 //   This example shows how to work with Hazelcast maps, where the map is
 //   updated continuously.
 //
@@ -253,13 +256,17 @@ async function nonStopMapExample(client) {
     }
 }
 
+// This is boilerplate application that configures client to connect Hazelcast
+// Cloud cluster.
+// see: https://docs.hazelcast.com/cloud/nodejs-client
+//
 (async () => {
     try {
         const client = await Client.newHazelcastClient(
             {
                 network: {
                     hazelcastCloud: {
-                        discoveryToken: 'YOUR_CLUSTER_DISCOVERY_TOKEN'
+                        discoveryToken: 'YOUR_DISCOVERY_TOKEN'
                     },
                     ssl: {
                         enabled: true,
@@ -268,12 +275,11 @@ async function nonStopMapExample(client) {
                             cert: [fs.readFileSync(path.resolve(path.join(__dirname, 'cert.pem')))],
                             key: [fs.readFileSync(path.resolve(path.join(__dirname, 'key.pem')))],
                             passphrase: 'YOUR_SSL_PASSWORD',
-                            rejectUnauthorized: false
+                            checkServerIdentity: () => null
                         }
                     }
                 },
                 clusterName: 'YOUR_CLUSTER_NAME'
-
             }
         );
         console.log("Connection Successful!");

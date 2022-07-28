@@ -92,10 +92,10 @@ async function selectAllCapitals(sqlService){
 async function selectCapitalNames(sqlService){
     console.log("Retrieving a city name via SQL...");
     const sqlResultRecord = await sqlService
-        .execute( "SELECT __key, this FROM capitals WHERE __key = ?", ["United States"]);
+        .execute( "SELECT __key, this FROM capitals WHERE __key = ?", ["United States"], {returnRawResult: true});
     for await (const row of sqlResultRecord) {
-        const country = row.country;
-        const city = row.city;
+        const country = row.getObject('__key');
+        const city = row.getObject('this');
         console.log(`Country name: ${country}; Capital name: ${city}`);
     }
     console.log("--------------------");
@@ -256,7 +256,7 @@ async function nonStopMapExample(client) {
 (async () => {
     try {
         const client = await Client.newHazelcastClient(
-            {
+    {
                 network: {
                     hazelcastCloud: {
                         discoveryToken: 'YOUR_DISCOVERY_TOKEN'
