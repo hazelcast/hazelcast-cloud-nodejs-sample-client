@@ -185,10 +185,10 @@ async function populateCities(hzClient) {
     console.log("Populating 'city' map with JSON values...");
 
     const cities = await hzClient.getMap("city");
-    cities.put(1, {"country": "AU", "city": "Canberra", "population": 467_194});
-    cities.put(2, {"country": "CZ", "city": "Prague", "population": 1_318_085});
-    cities.put(3, {"country": "EN", "city": "London", "population": 9_540_576});
-    cities.put(4, {"country": "US", "city": "Washington, DC", "population": 7_887_965});
+    await cities.put(1, {"country": "AU", "city": "Canberra", "population": 467_194});
+    await cities.put(2, {"country": "CZ", "city": "Prague", "population": 1_318_085});
+    await cities.put(3, {"country": "EN", "city": "London", "population": 9_540_576});
+    await cities.put(4, {"country": "US", "city": "Washington, DC", "population": 7_887_965});
     console.log("The 'city' map has been populated.");
     console.log("--------------------");
 }
