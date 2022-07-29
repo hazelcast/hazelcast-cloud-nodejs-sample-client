@@ -95,7 +95,7 @@ async function selectAllCapitals(sqlService){
 async function selectCapitalNames(sqlService){
     console.log("Retrieving a city name via SQL...");
     const sqlResultRecord = await sqlService
-        .execute( "SELECT __key, this FROM capitals WHERE __key = ?", ["United States"], {returnRawResult: true});
+        .execute("SELECT __key, this FROM capitals WHERE __key = ?", ["United States"], {returnRawResult: true});
     for await (const row of sqlResultRecord) {
         const country = row.getObject('__key');
         const city = row.getObject('this');
@@ -104,6 +104,14 @@ async function selectCapitalNames(sqlService){
     console.log("--------------------");
 }
 
+// This example shows how to work with Hazelcast SQL queries via Maps that
+// contains JSON serialized values.
+//
+// Select single json element data from a Map
+// Select data from Map with filtering
+// Join data from two Maps and select json elements
+//
+// @param client - a {@link HazelcastClient} client.
 async function jsonSerializationExample(hzClient) {
 
     const sqlService = hzClient.getSql();
