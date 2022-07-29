@@ -261,6 +261,10 @@ async function nonStopMapExample(client) {
     }
 }
 
+// This is boilerplate application that configures client to connect Hazelcast
+// Cloud cluster.
+// see: https://docs.hazelcast.com/cloud/nodejs-client
+//
 (async () => {
     try {
         const client = await Client.newHazelcastClient(
