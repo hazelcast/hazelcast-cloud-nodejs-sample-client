@@ -248,7 +248,7 @@ async function selectCountriesAndCities(sqlService) {
 //   @param client - a {@link HazelcastClient} client.
 //
 async function nonStopMapExample(client) {
-    console.log("Now, `map` will be filled with random entries.");
+    console.log("Now, the map named `map` will be filled with random entries.");
     const map = await client.getMap('map');
 
     let iterationCounter = 0;
