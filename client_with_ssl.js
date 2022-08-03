@@ -274,7 +274,7 @@ async function nonStopMapExample(client) {
             {
                 network: {
                     hazelcastCloud: {
-                        discoveryToken: 'YOUR_DISCOVERY_TOKEN'
+                        discoveryToken: 'YOUR_CLUSTER_DISCOVERY_TOKEN'
                     },
                     ssl: {
                         enabled: true,
