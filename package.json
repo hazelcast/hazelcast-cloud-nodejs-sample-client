@@ -12,6 +12,7 @@
   },
   "author": "",
   "dependencies": {
-    "hazelcast-client": "^5.0.2"
+    "hazelcast-client": "^5.1.0"
   }
 }
+
