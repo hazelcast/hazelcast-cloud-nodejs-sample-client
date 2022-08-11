@@ -268,13 +268,18 @@ async function nonStopMapExample(client) {
 (async () => {
     try {
         const client = await Client.newHazelcastClient(
-    {
+            {
                 network: {
                     hazelcastCloud: {
-                        discoveryToken: 'YOUR_DISCOVERY_TOKEN'
+                        discoveryToken: 'YOUR_CLUSTER_DISCOVERY_TOKEN'
                     }
                 },
-                clusterName: 'YOUR_CLUSTER_NAME'
+                clusterName: 'YOUR_CLUSTER_NAME',
+                properties: {
+                    'hazelcast.client.cloud.url': 'YOUR_DISCOVERY_URL',
+                    'hazelcast.client.statistics.enabled': true,
+                    'hazelcast.client.statistics.period.seconds': 1,
+                }
             }
         );
         console.log("Connection Successful!");
@@ -287,7 +292,7 @@ async function nonStopMapExample(client) {
 
         // await nonStopMapExample(client)
 
-        client.shutdown();
+        await client.shutdown();
     } catch (err) {
         console.error('Error occurred:', err);
     }
