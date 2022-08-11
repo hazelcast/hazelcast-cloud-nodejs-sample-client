@@ -1,58 +1,78 @@
-var async = require('async');
-var Client = require('hazelcast-client').Client;
-var ClientConfig = require('hazelcast-client').Config.ClientConfig;
+'use strict';
 
-function createClientConfig() {
-    var fs = require('fs');
-    var cfg = new ClientConfig();
-    cfg.networkConfig.cloudConfig.enabled = true;
-    cfg.networkConfig.cloudConfig.discoveryToken = 'YOUR_CLUSTER_DISCOVERY_TOKEN ';
-    cfg.networkConfig.redoOperation = true;
-    cfg.networkConfig.connectionAttemptLimit = 10;
-    cfg.groupConfig.name = 'YOUR_CLUSTER_NAME';
-    cfg.groupConfig.password = 'YOUR_CLUSTER_PASSWORD';
-    cfg.properties['hazelcast.client.cloud.url'] = 'YOUR_DISCOVERY_URL';
-    cfg.properties['hazelcast.client.statistics.enabled'] = true;
-    cfg.properties['hazelcast.client.statistics.period.seconds'] = 1;
-    return cfg;
+const {Client, HazelcastJsonValue} = require('hazelcast-client');
+
+// This example shows how to work with Hazelcast maps.
+// @param client - a {@link HazelcastClient} client.
+//
+async function mapExample(client){
+    const cities = await client.getMap('cities');
+    await cities.put(1, new HazelcastJsonValue(JSON.stringify({ country: "United Kingdom", city: "London", population: 9_540_576})));
+    await cities.put(2, new HazelcastJsonValue(JSON.stringify({ country: "United Kingdom", city: "Manchester", population: 2_770_434})));
+    await cities.put(3, new HazelcastJsonValue(JSON.stringify({ country: "United States", city: "New York", population: 19_223_191})));
+    await cities.put(4, new HazelcastJsonValue(JSON.stringify({ country: "United States", city: "Los Angeles", population: 3_985_520})));
+    await cities.put(5, new HazelcastJsonValue(JSON.stringify({ country: "Turkey", city: "Ankara", population: 5_309_690})));
+    await cities.put(6, new HazelcastJsonValue(JSON.stringify({ country: "Turkey", city: "Istanbul", population: 15_636_243})));
+    await cities.put(7, new HazelcastJsonValue(JSON.stringify({ country: "Brazil", city: "Sao Paulo", population: 22_429_800})));
+    await cities.put(8, new HazelcastJsonValue(JSON.stringify({ country: "Brazil", city: "Rio de Janeiro", population: 13_635_274})));
+
+    const mapSize = await cities.size();
+    console.log(`'cities' map now contains ${mapSize} entries.`);
+
+    console.log("--------------------");
 }
 
-var cfg = createClientConfig();
+//   This example shows how to work with Hazelcast maps, where the map is
+//   updated continuously.
+//
+//   @param client - a {@link HazelcastClient} client.
+//
+async function nonStopMapExample(client) {
+    console.log("Now, the map named `map` will be filled with random entries.");
+    const map = await client.getMap('map');
 
-Client.newHazelcastClient(cfg).then(function (hazelcastClient) {
-    var client = hazelcastClient;
-    var map;
-    hazelcastClient.getMap('map').then(function (mp) {
-      map = mp;
+    let iterationCounter = 0;
+    while (true) {
+        const randomKey = Math.floor(Math.random() * 100000);
+        await map.put('key' + randomKey, 'value' + randomKey);
+        await map.get('key' + Math.floor(Math.random() * 100000))
+        if (++iterationCounter === 10) {
+            iterationCounter = 0;
+            const size = await map.size();
+            console.log(`Current map size: ${size}`);
+        }
+    }
+}
 
-      map.put('key', 'value').then(function () {
-          return map.get('key');
-      }).then((res) => {
-          if(res === 'value')
-          {
-              console.log("Connection Successful!");
-              console.log("Now, `map` will be filled with random entries.");
-
-              var iterationCounter = 0;
-              async.whilst(() => {
-                return true;
-              },(next) => {
-                var randomKey = Math.floor(Math.random() * 100000);
-                map.put('key' + randomKey, 'value' + randomKey).then(function () {
-                    map.get('key' + randomKey);
-                    if (++iterationCounter === 10) {
-                        iterationCounter = 0;
-                        map.size().then((size) => console.log(`map size: ${size}`));
+// This is boilerplate application that configures client to connect Hazelcast
+// Cloud cluster.
+// see: https://docs.hazelcast.com/cloud/nodejs-client
+//
+(async () => {
+    try {
+        const client = await Client.newHazelcastClient(
+            {
+                network: {
+                    hazelcastCloud: {
+                        discoveryToken: 'YOUR_CLUSTER_DISCOVERY_TOKEN'
                     }
-                    next();
-                });
-              },(err) => {
-                client.shutdown();
-              });
-          }
-          else {
-              throw new Error("Connection failed, check your configuration.");
-          }
-      });
-    });
-});
+                },
+                clusterName: 'YOUR_CLUSTER_NAME',
+                properties: {
+                    'hazelcast.client.cloud.url': 'YOUR_DISCOVERY_URL',
+                    'hazelcast.client.statistics.enabled': true,
+                    'hazelcast.client.statistics.period.seconds': 1,
+                }
+            }
+        );
+        console.log("Connection Successful!");
+
+        await mapExample(client);
+
+        // await nonStopMapExample(client)
+
+        await client.shutdown();
+    } catch (err) {
+        console.error('Error occurred:', err);
+    }
+})();
