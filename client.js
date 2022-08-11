@@ -42,7 +42,7 @@ async function sqlExample(hzClient) {
 
 async function createMappingForCapitals(sqlService){
     console.log("Creating a mapping...");
-    // See: https://docs.hazelcast.com/hazelcast/5.1/sql/mapping-to-maps
+    // See: https://docs.hazelcast.com/hazelcast/5.0/sql/mapping-to-maps
     const mappingQuery = `
         CREATE OR REPLACE MAPPING capitals TYPE IMap 
         OPTIONS(
@@ -129,7 +129,7 @@ async function jsonSerializationExample(hzClient) {
 }
 
 async function createMappingForCountries(sqlService) {
-    // see: https://docs.hazelcast.com/hazelcast/5.1/sql/mapping-to-maps#json-objects
+    // see: https://docs.hazelcast.com/hazelcast/5.0/sql/mapping-to-maps#json-objects
     console.log("Creating mapping for countries...");
 
     const mappingQuery = `
@@ -149,7 +149,7 @@ async function createMappingForCountries(sqlService) {
 }
 
 async function populateCountriesWithMap(hzClient) {
-    // see: https://docs.hazelcast.com/hazelcast/5.1/data-structures/creating-a-map#writing-json-to-a-map
+    // see: https://docs.hazelcast.com/hazelcast/5.0/data-structures/creating-a-map#writing-json-to-a-map
     console.log("Populating 'countries' map with JSON values...");
 
     const countries = await hzClient.getMap("country");
@@ -173,7 +173,7 @@ async function selectAllCountries(sqlService) {
 }
 
 async function createMappingForCities(sqlService) {
-    //see: https://docs.hazelcast.com/hazelcast/5.1/sql/mapping-to-maps#json-objects
+    //see: https://docs.hazelcast.com/hazelcast/5.0/sql/mapping-to-maps#json-objects
     console.log("Creating mapping for cities...");
 
     const mappingQuery = `
@@ -194,7 +194,7 @@ async function createMappingForCities(sqlService) {
 }
 
 async function populateCities(hzClient) {
-    // see: https://docs.hazelcast.com/hazelcast/5.1/data-structures/creating-a-map#writing-json-to-a-map
+    // see: https://docs.hazelcast.com/hazelcast/5.0/data-structures/creating-a-map#writing-json-to-a-map
     console.log("Populating 'city' map with JSON values...");
 
     const cities = await hzClient.getMap("city");
