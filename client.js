@@ -45,10 +45,12 @@ async function createMappingForCapitals(sqlService){
     // See: https://docs.hazelcast.com/hazelcast/5.0/sql/mapping-to-maps
     const mappingQuery = `
         CREATE OR REPLACE MAPPING capitals TYPE IMap 
+
         OPTIONS(
             'keyFormat'='varchar',
             'valueFormat'='varchar'
         );`;
+
     await sqlService.execute(mappingQuery);
     console.log("The mapping has been created successfully.");
     console.log("--------------------");
@@ -81,6 +83,7 @@ async function selectAllCapitals(sqlService){
     console.log("Retrieving all the data via SQL...");
     const sqlResultAll = await sqlService
         .execute("SELECT * FROM capitals", [], {returnRawResult: true});
+
     for await (const row of sqlResultAll) {
         const country = row.getObject(0);
         const city = row.getObject(1);

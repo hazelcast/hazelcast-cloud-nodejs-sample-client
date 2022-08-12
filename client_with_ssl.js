@@ -152,6 +152,7 @@ async function createMappingForCountries(sqlService) {
 }
 
 async function populateCountriesWithMap(hzClient) {
+
     // see: https://docs.hazelcast.com/hazelcast/5.0/data-structures/creating-a-map#writing-json-to-a-map
     console.log("Populating 'countries' map with JSON values...");
 
@@ -192,6 +193,7 @@ async function createMappingForCities(sqlService) {
         );`;
 
     await sqlService.execute(mappingQuery);
+
     console.log("Mapping for cities has been created.");
     console.log("--------------------");
 }
@@ -201,6 +203,7 @@ async function populateCities(hzClient) {
     console.log("Populating 'city' map with JSON values...");
 
     const cities = await hzClient.getMap("city");
+
     await cities.put(1, {"country": "AU", "city": "Canberra", "population": 467_194});
     await cities.put(2, {"country": "CZ", "city": "Prague", "population": 1_318_085});
     await cities.put(3, {"country": "EN", "city": "London", "population": 9_540_576});
@@ -306,6 +309,7 @@ async function nonStopMapExample(client) {
         // await nonStopMapExample(client)
 
         await client.shutdown();
+
     } catch (err) {
         console.error('Error occurred:', err);
     }
