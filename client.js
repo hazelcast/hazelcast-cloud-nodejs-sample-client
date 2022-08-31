@@ -268,7 +268,7 @@ async function nonStopMapExample(client) {
 (async () => {
     try {
         const client = await Client.newHazelcastClient(
-    {
+            {
                 network: {
                     hazelcastCloud: {
                         discoveryToken: 'YOUR_CLUSTER_DISCOVERY_TOKEN'
@@ -292,7 +292,7 @@ async function nonStopMapExample(client) {
 
         // await nonStopMapExample(client)
 
-        client.shutdown();
+        await client.shutdown();
     } catch (err) {
         console.error('Error occurred:', err);
     }
