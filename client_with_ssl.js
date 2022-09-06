@@ -294,7 +294,7 @@ async function nonStopMapExample(client) {
                 properties: {
                     'hazelcast.client.cloud.url': 'YOUR_DISCOVERY_URL',
                     'hazelcast.client.statistics.enabled': true,
-                    'hazelcast.client.statistics.period.seconds': 1,
+                    'hazelcast.client.statistics.period.seconds': 5,
                 }
             }
         );
