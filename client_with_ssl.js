@@ -288,9 +288,7 @@ async function nonStopMapExample(client) {
                     }
                 },
                 clusterName: 'YOUR_CLUSTER_NAME',
-                properties: {
-                    'hazelcast.client.cloud.url': 'YOUR_DISCOVERY_URL',
-                }
+                properties: {'hazelcast.client.cloud.url': 'YOUR_DISCOVERY_URL'}
             }
         );
         console.log("Connection Successful!");
