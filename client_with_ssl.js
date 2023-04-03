@@ -17,8 +17,7 @@
 const { Client } = require('hazelcast-client');
 const fs = require('fs');
 const path = require('path');
-const printf = require('printf');
-
+const sprintf= require('sprintf-js').sprintf;
 async function createMapping(client) {
     console.log("Creating the mapping...");
     // Mapping is required for your distributed map to be queried over SQL.
@@ -73,12 +72,16 @@ async function fetchCities(client) {
 
     console.log("OK.");
     console.log("--Results of 'SELECT __key, this FROM cities'");
-    printf("| %4s | %20s | %20s | %15s |\n", "id", "country", "city", "population");
+    sprintf("| %4$s | %20$s | %20$s | %15$s |\n", "id", "country", "city", "population");
+
+    // NodeJS client does lazy deserialization. In order to update schema table on the client,
+    // it's required to get map. 
+    const cities = await client.getMap("cities");
 
     for await (const row of sqlResultAll) {
         const id = row.getObject("__key");
         const city = row.getObject("this");
-        printf("| %4d | %20s | %20s | %15d |\n", id, city.country, city.cityName, city.population)
+        sprintf("| %4$d | %20$s | %20$s | %15$d |\n", id, city.country, city.cityName, city.population);
     }
 
     console.log("\n!! Hint !! You can execute your SQL queries on your Viridian cluster over the management center. \n 1. Go to 'Management Center' of your Hazelcast Viridian cluster. \n 2. Open the 'SQL Browser'. \n 3. Try to execute 'SELECT * FROM cities'.\n");
@@ -127,7 +130,7 @@ class CitySerializer {
             {
                 network: {
                     hazelcastCloud: {
-                        discoveryToken: 'YOUR_CLUSTER_DISCOVERY_TOKEN '
+                        discoveryToken: 'm55RSliRDsD6P1RKYCuPQIHx6t0lNfOLjTl6GvMFUmdtOkUA7M '
                     },
                     ssl: {
                         enabled: true,
@@ -135,17 +138,19 @@ class CitySerializer {
                             ca: [fs.readFileSync(path.resolve(path.join(__dirname, 'ca.pem')))],
                             cert: [fs.readFileSync(path.resolve(path.join(__dirname, 'cert.pem')))],
                             key: [fs.readFileSync(path.resolve(path.join(__dirname, 'key.pem')))],
-                            passphrase: 'YOUR_CLUSTER_PASSWORD',
+                            passphrase: 'd74f035016d',
                             checkServerIdentity: () => null
                         }
                     }
                 },
-                clusterName: 'YOUR_CLUSTER_NAME',                
+                clusterName: 'pr-bpmur7wb',                
                 serialization: {
                     compact: {
-                        serializers: [new CitySerializer()]
-                    }
-                }
+                        serializers: [new CitySerializer()],
+                        
+                    },
+                    defaultNumberType:"integer"
+                }                
             }
         );
         console.log("Connection Successful!");
