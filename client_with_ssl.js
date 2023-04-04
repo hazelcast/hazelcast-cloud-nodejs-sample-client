@@ -72,16 +72,17 @@ async function fetchCities(client) {
 
     console.log("OK.");
     console.log("--Results of 'SELECT __key, this FROM cities'");
-    sprintf("| %4$s | %20$s | %20$s | %15$s |\n", "id", "country", "city", "population");
+    console.log(sprintf("| %4s | %20s | %20s | %15s |", "id", "country", "city", "population"));
 
     // NodeJS client does lazy deserialization. In order to update schema table on the client,
-    // it's required to get map. 
+    // it's required to get a map value. 
     const cities = await client.getMap("cities");
+    await cities.get(1);
 
     for await (const row of sqlResultAll) {
         const id = row.getObject("__key");
         const city = row.getObject("this");
-        sprintf("| %4$d | %20$s | %20$s | %15$d |\n", id, city.country, city.cityName, city.population);
+        console.log(sprintf("| %4d | %20s | %20s | %15d |", id, city.country, city.city, city.population));
     }
 
     console.log("\n!! Hint !! You can execute your SQL queries on your Viridian cluster over the management center. \n 1. Go to 'Management Center' of your Hazelcast Viridian cluster. \n 2. Open the 'SQL Browser'. \n 3. Try to execute 'SELECT * FROM cities'.\n");
