@@ -130,7 +130,7 @@ class CitySerializer {
             {
                 network: {
                     hazelcastCloud: {
-                        discoveryToken: 'm55RSliRDsD6P1RKYCuPQIHx6t0lNfOLjTl6GvMFUmdtOkUA7M '
+                        discoveryToken: 'YOUR_CLUSTER_DISCOVERY_TOKEN '
                     },
                     ssl: {
                         enabled: true,
@@ -138,12 +138,13 @@ class CitySerializer {
                             ca: [fs.readFileSync(path.resolve(path.join(__dirname, 'ca.pem')))],
                             cert: [fs.readFileSync(path.resolve(path.join(__dirname, 'cert.pem')))],
                             key: [fs.readFileSync(path.resolve(path.join(__dirname, 'key.pem')))],
-                            passphrase: 'd74f035016d',
+                            passphrase: 'YOUR_SSL_PASSWORD',
                             checkServerIdentity: () => null
                         }
                     }
                 },
-                clusterName: 'pr-bpmur7wb',                
+                clusterName: 'YOUR_CLUSTER_NAME',     
+                properties: {'hazelcast.client.cloud.url': 'YOUR_DISCOVERY_URL'},           
                 serialization: {
                     compact: {
                         serializers: [new CitySerializer()],
