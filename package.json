@@ -12,7 +12,8 @@
   },
   "author": "",
   "dependencies": {
-    "hazelcast-client": "^5.1.0"
+    "hazelcast-client": "^5.2.0",
+    "printf": "^0.6.1",
+    "sprintf-js": "^1.1.2"
   }
 }
-
